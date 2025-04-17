@@ -1,5 +1,6 @@
 package org.micoli.dxcompanion.ui;
 
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
@@ -34,7 +35,7 @@ class ToolWindowContent {
         this.contentPanel.setLayout(new BorderLayout(2, 2));
         this.contentPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         this.contentPanel.add(this.mainPanel, BorderLayout.CENTER);
-        this.contentPanel.add(createControlsPanel(), BorderLayout.PAGE_END);
+        this.contentPanel.add(createToolbar(), BorderLayout.NORTH);
         this.mainPanel.setLayout(new BorderLayout());
         this.project = project;
         AppExecutorUtil.getAppScheduledExecutorService().scheduleWithFixedDelay(() -> {
@@ -96,15 +97,21 @@ class ToolWindowContent {
         this.mainPanel.removeAll();
     }
 
-    @NotNull
-    private JPanel createControlsPanel() {
-        JPanel controlsPanel = new JPanel();
-        JButton refreshDateAndTimeButton = new JButton("Refresh", DxIcon.Refresh);
-        controlsPanel.add(refreshDateAndTimeButton);
-        refreshDateAndTimeButton.addActionListener(e -> {
-            updateMainPanel();
-            this.mainPanel.revalidate();
-        });
-        return controlsPanel;
+    private JComponent createToolbar() {
+            JPanel toolbarPanel = new JPanel(new BorderLayout());
+            DefaultActionGroup rightActionGroup = new DefaultActionGroup();
+
+            rightActionGroup.add(new AnAction("Refresh", "Refresh tree", DxIcon.Refresh) {
+                @Override
+                public void actionPerformed(@NotNull AnActionEvent e) {
+                    updateMainPanel();
+                    mainPanel.revalidate();
+                }
+            });
+            ActionToolbar rightToolbar = ActionManager.getInstance().createActionToolbar("DxCompanionRightToolbar", rightActionGroup, true);
+            rightToolbar.setTargetComponent(mainPanel);
+            toolbarPanel.add(rightToolbar.getComponent(), BorderLayout.EAST);
+
+            return toolbarPanel;
     }
 }
