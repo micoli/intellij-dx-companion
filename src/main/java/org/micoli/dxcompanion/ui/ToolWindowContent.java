@@ -11,10 +11,8 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.micoli.dxcompanion.configuration.ConfigurationException;
 import org.micoli.dxcompanion.configuration.ConfigurationFactory;
-import org.micoli.dxcompanion.configuration.models.Configuration;
-import org.micoli.dxcompanion.ui.components.DxIcon;
-import org.micoli.dxcompanion.ui.components.DynamicTreeNode;
-import org.micoli.dxcompanion.ui.components.FileObserverToggle;
+import org.micoli.dxcompanion.configuration.models.Action;
+import org.micoli.dxcompanion.ui.components.*;
 import org.micoli.dxcompanion.ui.components.tree.ActionTreeFactory;
 import org.micoli.dxcompanion.ui.components.tree.TreeUtils;
 
@@ -30,6 +28,7 @@ class ToolWindowContent {
     private Tree tree;
     private String serial = null;
     private final ActionTreeFactory actionTreeFactory = new ActionTreeFactory();
+    private final DefaultActionGroup leftActionGroup = new DefaultActionGroup();
 
     public ToolWindowContent(Project project) {
         this.contentPanel.setLayout(new BorderLayout(2, 2));
@@ -46,7 +45,7 @@ class ToolWindowContent {
     }
 
     private void refreshComponents() {
-        if(this.tree == null){
+        if (this.tree == null) {
             return;
         }
         TreeUtils.forEachLeaf(this.tree, (node, path) -> {
@@ -65,10 +64,8 @@ class ToolWindowContent {
             removeAllComponents();
             serial = loadedConfiguration.serial;
 
-            this.tree = actionTreeFactory.treeBuilder(loadedConfiguration.configuration.nodes.clone());
-            JBScrollPane comp = new JBScrollPane(this.tree);
-            comp.setBorder(JBUI.Borders.empty());
-            this.mainPanel.add(comp, BorderLayout.CENTER);
+            this.loadButtonBar(loadedConfiguration);
+            this.loadActionTree(loadedConfiguration);
 
             LOGGER.debug("MainPanel reloaded");
         } catch (ConfigurationException e) {
@@ -85,8 +82,29 @@ class ToolWindowContent {
         }
     }
 
+    private void loadActionTree(ConfigurationFactory.LoadedConfiguration loadedConfiguration) {
+        if (loadedConfiguration.configuration.nodes == null) {
+            this.mainPanel.add(new Panel(), BorderLayout.CENTER);
+            return;
+        }
+        this.tree = actionTreeFactory.treeBuilder(loadedConfiguration.configuration.nodes.clone());
+        JBScrollPane comp = new JBScrollPane(this.tree);
+        comp.setBorder(JBUI.Borders.empty());
+        this.mainPanel.add(comp, BorderLayout.CENTER);
+    }
+
+    private void loadButtonBar(ConfigurationFactory.LoadedConfiguration loadedConfiguration) {
+        this.leftActionGroup.removeAll();
+        if (loadedConfiguration.configuration.toolbarButtons == null) {
+            return;
+        }
+        for (Action button : loadedConfiguration.configuration.toolbarButtons.clone()) {
+            this.leftActionGroup.add(new ActionToolbarButton(this.mainPanel, button));
+        }
+    }
+
     private void removeAllComponents() {
-        if(this.tree == null){
+        if (this.tree == null) {
             return;
         }
         TreeUtils.forEachLeaf(this.tree, (node, path) -> {
@@ -98,20 +116,24 @@ class ToolWindowContent {
     }
 
     private JComponent createToolbar() {
-            JPanel toolbarPanel = new JPanel(new BorderLayout());
-            DefaultActionGroup rightActionGroup = new DefaultActionGroup();
+        JPanel toolbarPanel = new JPanel(new BorderLayout());
+        DefaultActionGroup rightActionGroup = new DefaultActionGroup();
 
-            rightActionGroup.add(new AnAction("Refresh", "Refresh tree", DxIcon.Refresh) {
-                @Override
-                public void actionPerformed(@NotNull AnActionEvent e) {
-                    updateMainPanel();
-                    mainPanel.revalidate();
-                }
-            });
-            ActionToolbar rightToolbar = ActionManager.getInstance().createActionToolbar("DxCompanionRightToolbar", rightActionGroup, true);
-            rightToolbar.setTargetComponent(mainPanel);
-            toolbarPanel.add(rightToolbar.getComponent(), BorderLayout.EAST);
+        rightActionGroup.add(new AnAction("Refresh", "Refresh tree", DxIcon.Refresh) {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent e) {
+                updateMainPanel();
+                mainPanel.revalidate();
+            }
+        });
+        ActionToolbar rightToolbar = ActionManager.getInstance().createActionToolbar("DxCompanionRightToolbar", rightActionGroup, true);
+        rightToolbar.setTargetComponent(mainPanel);
+        toolbarPanel.add(rightToolbar.getComponent(), BorderLayout.EAST);
 
-            return toolbarPanel;
+        ActionToolbar leftToolbar = ActionManager.getInstance().createActionToolbar("DxCompanionRightToolbar", leftActionGroup, true);
+        leftToolbar.setTargetComponent(mainPanel);
+        toolbarPanel.add(leftToolbar.getComponent(), BorderLayout.WEST);
+
+        return toolbarPanel;
     }
 }
