@@ -47,11 +47,11 @@ public class ConfigurationFactoryTest {
         File file = getConfigurationPath(testPath);
 
         // When
-        Configuration configuration = ConfigurationFactory.get(file.getAbsolutePath());
+        ConfigurationFactory.LoadedConfiguration createdConfiguration = ConfigurationFactory.get(file.getAbsolutePath());
 
         //Then
         objectMapper.registerSubtypes(AbstractNode.class);
-        String loadedConfiguration = objectMapper.writeValueAsString(configuration);
+        String loadedConfiguration = objectMapper.writeValueAsString(createdConfiguration.configuration);
         String expectedConfiguration = Files.asCharSource(new File(Objects.requireNonNull(getClass().getClassLoader().getResource("configuration/" + testPath + "/expect.json")).getFile()), StandardCharsets.UTF_8).read();
         assertThatJson(loadedConfiguration)
             .when(Option.IGNORING_EXTRA_FIELDS)

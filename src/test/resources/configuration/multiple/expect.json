@@ -63,6 +63,5 @@
       "command": "sleep 3;exit",
       "shortcut": "ctrl alt n"
     }
-  ],
-  "serial": "${json-unit.any-string}"
+  ]
 }

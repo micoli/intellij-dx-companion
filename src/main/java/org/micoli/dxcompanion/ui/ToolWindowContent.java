@@ -2,6 +2,7 @@ package org.micoli.dxcompanion.ui;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
+import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.concurrency.AppExecutorUtil;
@@ -26,7 +27,7 @@ class ToolWindowContent {
     public final JPanel contentPanel = new JPanel();
     private final JComponent mainPanel = new JPanel();
     private Tree tree;
-    private Configuration configuration = new Configuration();
+    private String serial = null;
     private final ActionTreeFactory actionTreeFactory = new ActionTreeFactory();
 
     public ToolWindowContent(Project project) {
@@ -55,31 +56,32 @@ class ToolWindowContent {
     }
 
     private void updateMainPanel() {
-        Configuration newConfiguration;
         try {
-            newConfiguration = ConfigurationFactory.get(project.getBasePath());
+            ConfigurationFactory.LoadedConfiguration loadedConfiguration = ConfigurationFactory.get(project.getBasePath());
+            if (loadedConfiguration.serial.equals(serial)) {
+                return;
+            }
+            removeAllComponents();
+            serial = loadedConfiguration.serial;
+
+            this.tree = actionTreeFactory.treeBuilder(loadedConfiguration.configuration.nodes.clone());
+            JBScrollPane comp = new JBScrollPane(this.tree);
+            comp.setBorder(JBUI.Borders.empty());
+            this.mainPanel.add(comp, BorderLayout.CENTER);
+
+            LOGGER.debug("MainPanel reloaded");
         } catch (ConfigurationException e) {
             removeAllComponents();
             this.tree = null;
-            this.mainPanel.add(new TextArea(e.getMessage()));
-            this.mainPanel.revalidate();
-            configuration.serial = null;
-            return;
+            this.serial = null;
+            JTextArea errorTextArea = new JTextArea(e.getMessage());
+            errorTextArea.setEditable(false);
+            errorTextArea.setLineWrap(true);
+            errorTextArea.setWrapStyleWord(true);
+            errorTextArea.setForeground(JBColor.RED);
+            errorTextArea.setFont(new Font("Dialog", Font.PLAIN, 12));
+            this.mainPanel.add(errorTextArea, BorderLayout.CENTER);
         }
-        if (newConfiguration.serial.equals(configuration.serial)) {
-            return;
-        }
-
-        removeAllComponents();
-        this.mainPanel.revalidate();
-
-        this.tree = actionTreeFactory.treeBuilder(newConfiguration.nodes);
-        JBScrollPane comp = new JBScrollPane(this.tree);
-        comp.setBorder(JBUI.Borders.empty());
-        this.mainPanel.add(comp, BorderLayout.CENTER);
-
-        configuration = newConfiguration;
-        LOGGER.debug("MainPanel reloaded");
     }
 
     private void removeAllComponents() {

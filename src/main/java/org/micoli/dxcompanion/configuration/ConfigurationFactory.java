@@ -19,6 +19,15 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ConfigurationFactory {
+    public static class LoadedConfiguration {
+        public Configuration configuration;
+        public String serial;
+
+        private LoadedConfiguration(Configuration configuration, String serial) {
+            this.configuration = configuration;
+            this.serial = serial;
+        }
+    }
     private static final MessageDigest messageDigest;
     private static final ArrayList<String> acceptableConfigurationFiles = new ArrayList<>(Arrays.asList(".dx-companion.json", ".dx-companion.local.json"));
 
@@ -30,7 +39,7 @@ public class ConfigurationFactory {
         }
     }
 
-    public static Configuration get(String projectPath) throws ConfigurationException {
+    public static LoadedConfiguration get(String projectPath) throws ConfigurationException {
         List<String> files = acceptableConfigurationFiles.stream().filter((configurationFile) -> new File(projectPath, configurationFile).exists()).toList();
         if (files.isEmpty()) {
             throw new ConfigurationException("No .dx-companion(.*).json configuration file(s) found.");
@@ -41,9 +50,10 @@ public class ConfigurationFactory {
         String stringContent = "";
         try {
             stringContent = loadJsonFiles(projectPath, files);
-            Configuration configuration = objectMapper.readValue(stringContent, Configuration.class);
-            configuration.serial = Arrays.toString(messageDigest.digest(stringContent.getBytes(StandardCharsets.UTF_8)));
-            return configuration;
+            return new LoadedConfiguration(
+                objectMapper.readValue(stringContent, Configuration.class),
+                Arrays.toString(messageDigest.digest(stringContent.getBytes(StandardCharsets.UTF_8)))
+            );
         } catch (Exception e) {
             throw new ConfigurationException(e.getMessage() + "\\n" + stringContent);
         }

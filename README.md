@@ -5,6 +5,31 @@
 
 DX Companion is an IntelliJ IDEA plugin designed to enhance developer experience by providing a customizable, configuration-driven interface for common development actions. The plugin creates a dedicated tool window that allows developers to execute terminal commands, toggle environment variables, and trigger IntelliJ actions through a tree-based UI with keyboard shortcuts support.
 
+```json
+{
+  "toolbarButtons": [
+     {
+        "type": "action",
+        "label": "Build Project",
+        "command": "mvn install"
+     }
+  ],
+  "nodes": [
+    {
+     "type": "observedFile",
+      "label": "Debug Mode",
+      "filePath": ".env",
+      "variableName": "DEBUG_MODE"
+    },
+    {
+       "type": "action",
+      "label": "Build clean Project",
+      "command": "mvn clean install"
+    }
+  ]
+}
+```
+
 ## Features
 
 ### File Observation System
@@ -118,10 +143,10 @@ The plugin supports three main node types:
 
 ### Root Properties
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `observedFiles` | Array | List of files to observe for toggling variables |
-| `actions` | Array | List of shell commands to execute |
+| Property | Type | Description                            |
+|----------|------|----------------------------------------|
+| `nodes`  | Array | List action Nodes,ObservedFile or Path |
+| `toolbarButtons`  | Array | List of action nodes                   |
 
 ### ObservedFile Properties
 
@@ -156,32 +181,17 @@ DxCompanion uses IntelliJ's built-in icon system. You can specify icons from the
 - `debugger/threadRunning.svg`
 - `expui/actions/buildAutoReloadChanges.svg`
 
-## Examples
-
-### Basic Example
+## Comprehensive Example
 
 ```json
 {
-  "observedFiles": [
-    {
-      "label": "Debug Mode",
-      "filePath": ".env",
-      "variableName": "DEBUG_MODE"
-    }
+  "toolbarButtons": [
+     {
+        "label": "Build",
+        "command": "mvn clean install",
+        "icon": "actions/compile.svg"
+     }
   ],
-  "actions": [
-    {
-      "label": "Build Project",
-      "command": "mvn clean install"
-    }
-  ]
-}
-```
-
-### Comprehensive Example
-
-```json
-{
   "nodes": [
     {
       "label": "Debug Mode",
