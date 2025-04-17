@@ -21,16 +21,16 @@ public class ActionNode extends DynamicTreeNode {
         Project project = ProjectManager.getInstance().getOpenProjects()[0];
         Runnable commandAction = () -> {
             if (action.command.startsWith(ACTION_PREFIX)) {
-                invokeBuiltinActionFromComponent(action.command.replaceFirst(ACTION_PREFIX, ""));
+                runBuiltinAction(action.command.replaceFirst(ACTION_PREFIX, ""));
                 return;
             }
-            runAction(action, project);
+            runShellAction(action, project);
         };
         this.setAction(commandAction);
         registerShortcut(action.label, action.shortcut, commandAction);
     }
 
-    private static void runAction(Action action, Project project) {
+    private static void runShellAction(Action action, Project project) {
         String cwd = action.cwd != null ? action.cwd : project.getBasePath();
         try {
             TerminalToolWindowManager
@@ -42,7 +42,7 @@ public class ActionNode extends DynamicTreeNode {
         }
     }
 
-    public void invokeBuiltinActionFromComponent(String actionId) {
+    public void runBuiltinAction(String actionId) {
         ActionManager actionManager = ActionManager.getInstance();
         AnAction action = actionManager.getAction(actionId);
 
