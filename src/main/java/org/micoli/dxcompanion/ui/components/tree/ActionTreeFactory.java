@@ -73,7 +73,7 @@ public class ActionTreeFactory {
                 if (e.getClickCount() != 2) {
                     return;
                 }
-                TreePath path = tree.getPathForLocation(e.getX(), e.getY());
+                TreePath path = tree.getPathForRow(tree.getClosestRowForLocation(e.getX(), e.getY()));
                 if (path == null) {
                     return;
                 }
