@@ -7,7 +7,6 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
-import com.intellij.openapi.ui.Messages;
 import org.jetbrains.plugins.terminal.TerminalToolWindowManager;
 import org.micoli.dxcompanion.configuration.models.Action;
 import org.micoli.dxcompanion.ui.Notification;

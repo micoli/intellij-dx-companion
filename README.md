@@ -16,15 +16,15 @@ DX Companion is an IntelliJ IDEA plugin designed to enhance developer experience
   ],
   "nodes": [
     {
-     "type": "observedFile",
-      "label": "Debug Mode",
-      "filePath": ".env",
-      "variableName": "DEBUG_MODE"
+       "type": "observedFile",
+       "label": "Debug Mode",
+       "filePath": ".env",
+       "variableName": "DEBUG_MODE"
     },
     {
        "type": "action",
-      "label": "Build clean Project",
-      "command": "mvn clean install"
+       "label": "Build clean Project",
+       "command": "mvn clean install"
     }
   ]
 }
@@ -109,7 +109,8 @@ The plugin supports three main node types:
        "command": "action:ActivateTerminalToolWindow"
    }
    ```
-2. Observed File Nodes
+   To help writing of `action:xxx` command, an autocompletion is available when editing `.dx-companion.json`
+3. Observed File Nodes
 
    These nodes monitor configuration files (like .env) and allow toggling variables on/off by commenting/uncommenting:
    ```json

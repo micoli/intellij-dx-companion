@@ -29,7 +29,7 @@ public class ConfigurationFactory {
         }
     }
     private static final MessageDigest messageDigest;
-    private static final ArrayList<String> acceptableConfigurationFiles = new ArrayList<>(Arrays.asList(".dx-companion.json", ".dx-companion.local.json"));
+    public static final ArrayList<String> acceptableConfigurationFiles = new ArrayList<>(Arrays.asList(".dx-companion.json", ".dx-companion.local.json"));
 
     static {
         try {

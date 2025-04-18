@@ -11,6 +11,7 @@
     <depends>org.jetbrains.plugins.terminal</depends>
 
     <extensions defaultExtensionNs="com.intellij">
+        <completion.contributor language="JSON" implementationClass="org.micoli.dxcompanion.autocomplete.DxActionCompletionContributor"/>
         <notificationGroup id="DX Companion" displayType="BALLOON"/>
         <toolWindow id="DX Companion" secondary="true" icon="AllIcons.Toolwindows.WebToolWindow" anchor="left"
                     factoryClass="org.micoli.dxcompanion.ui.ToolWindowFactory"/>
