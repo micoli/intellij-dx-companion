@@ -30,15 +30,6 @@ public class ActionTreeFactory {
             tree.expandRow(i);
         }
 
-        tree.addTreeSelectionListener(e -> {
-            DefaultMutableTreeNode selectedNode =
-                (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-
-            if (selectedNode != null) {
-                System.out.println("Selected: " + selectedNode.getUserObject().toString());
-            }
-        });
-
         registerDoubleClickAction(tree);
         registerEnterKeyAction(tree);
 

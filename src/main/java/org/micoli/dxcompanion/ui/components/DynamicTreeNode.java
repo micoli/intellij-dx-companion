@@ -24,10 +24,10 @@ public class DynamicTreeNode extends DefaultMutableTreeNode {
         super(configurationNode);
         this.tree = tree;
         this.label = configurationNode.label;
-        if (configurationNode instanceof Action _action && _action.shortcut!=null){
+        if (configurationNode instanceof Action _action && _action.shortcut != null) {
             this.tooltip = _action.shortcut;
         }
-        if (configurationNode instanceof ObservedFile _observedFile && _observedFile.shortcut!=null){
+        if (configurationNode instanceof ObservedFile _observedFile && _observedFile.shortcut != null) {
             this.tooltip = _observedFile.shortcut;
         }
         this.icon = icon;

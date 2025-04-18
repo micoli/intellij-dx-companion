@@ -3,10 +3,14 @@ package org.micoli.dxcompanion.ui.components;
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.ui.Messages;
 import org.jetbrains.plugins.terminal.TerminalToolWindowManager;
 import org.micoli.dxcompanion.configuration.models.Action;
+import org.micoli.dxcompanion.ui.Notification;
 
 import java.awt.Component;
 import java.io.IOException;
@@ -48,14 +52,22 @@ public class RunnableAction implements Runnable {
         ActionManager actionManager = ActionManager.getInstance();
         AnAction action = actionManager.getAction(actionId);
 
-        if (action != null) {
-            DataContext dataContext = DataManager.getInstance().getDataContext(this.component);
+        if (action == null) {
+            Notification.error(String.format("Action '%s' doesn't exist.", actionId));
+            return;
+        }
+
+        try {
+            Editor activeEditor = FileEditorManager.getInstance(ProjectManager.getInstance().getOpenProjects()[0]).getSelectedTextEditor();
+            DataContext dataContext = DataManager.getInstance().getDataContext(activeEditor != null ? activeEditor.getComponent() : this.component);
             action.actionPerformed(AnActionEvent.createFromAnAction(
                 action,
                 null,
                 ActionPlaces.UNKNOWN,
                 dataContext
             ));
+        } catch (Exception e) {
+            Notification.error(String.format("Error while executing '%s' : %s", actionId, e.getMessage()));
         }
     }
 }
