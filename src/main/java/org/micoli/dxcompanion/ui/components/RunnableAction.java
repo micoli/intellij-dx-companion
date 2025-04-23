@@ -2,6 +2,7 @@ package org.micoli.dxcompanion.ui.components;
 
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.ex.ActionUtil;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
@@ -59,12 +60,13 @@ public class RunnableAction implements Runnable {
         try {
             Editor activeEditor = FileEditorManager.getInstance(ProjectManager.getInstance().getOpenProjects()[0]).getSelectedTextEditor();
             DataContext dataContext = DataManager.getInstance().getDataContext(activeEditor != null ? activeEditor.getComponent() : this.component);
-            action.actionPerformed(AnActionEvent.createFromAnAction(
+            AnActionEvent actionEvent = AnActionEvent.createFromAnAction(
                 action,
                 null,
                 ActionPlaces.UNKNOWN,
                 dataContext
-            ));
+            );
+            ActionUtil.performActionDumbAwareWithCallbacks(action, actionEvent);
         } catch (Exception e) {
             Notification.error(String.format("Error while executing '%s' : %s", actionId, e.getMessage()));
         }

@@ -9,6 +9,7 @@
 
     <depends>com.intellij.modules.platform</depends>
     <depends>org.jetbrains.plugins.terminal</depends>
+    <depends>com.intellij.modules.json</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <completion.contributor language="JSON" implementationClass="org.micoli.dxcompanion.autocomplete.DxActionCompletionContributor"/>

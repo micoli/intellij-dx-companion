@@ -1,25 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
-  <!-- Fond carré avec coins arrondis -->
-  <rect width="40" height="40" rx="5" fill="#252536" />
-  
-  <!-- Lettre D -->
-  <path d="M8 10 Q8 6, 12 6 L18 6 Q22 6, 22 10 L22 20 Q22 24, 18 24 L12 24 Q8 24, 8 20 Z" fill="#3592C4" />
-  <path d="M12 10 L12 20 L16 20 Q18 20, 18 18 L18 12 Q18 10, 16 10 Z" fill="#252536" />
-  
-  <!-- Lettre X -->
-  <path d="M26 8 L32 16 L26 24 L30 24 L34 18 L38 24 L42 24 L36 16 L42 8 L38 8 L34 14 L30 8 Z" fill="#F0A732" />
-  
-  <!-- Companion (forme humanoïde stylisée) -->
-  <circle cx="20" cy="30" r="3" fill="#6AAF32" />
-  <!-- Corps du companion -->
-  <rect x="18" y="33" width="4" height="5" rx="1" fill="#6AAF32" />
-  <!-- Bras -->
-  <line x1="16" y1="34" x2="18" y2="34" stroke="#6AAF32" stroke-width="2" stroke-linecap="round" />
-  <line x1="22" y1="34" x2="24" y2="34" stroke="#6AAF32" stroke-width="2" stroke-linecap="round" />
-  
-
-  <!-- Détails du visage -->
-  <circle cx="19" cy="29" r="0.5" fill="#252536" />
-  <circle cx="21" cy="29" r="0.5" fill="#252536" />
-  <path d="M19 31 L21 31" stroke="#252536" stroke-width="0.5" stroke-linecap="round" />
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="456.108 225.783 40 40" width="40px" height="40px">
+  <rect width="40" height="40" rx="5" fill="#252536" x="456.108" y="225.783" transform="matrix(1, 0, 0, 0.9999999999999999, 0, 2.842170943040401e-14)"/>
+  <circle cx="475.108" cy="254.783" r="0.5" fill="#252536" transform="matrix(1, 0, 0, 0.9999999999999999, 0, 2.842170943040401e-14)"/>
+  <circle cx="477.108" cy="254.783" r="0.5" fill="#252536" transform="matrix(1, 0, 0, 0.9999999999999999, 0, 2.842170943040401e-14)"/>
+  <path d="M 475.108 256.783 L 477.108 256.783" stroke="#252536" stroke-width="0.5" stroke-linecap="round" transform="matrix(1, 0, 0, 0.9999999999999999, 0, 2.842170943040401e-14)"/>
+  <text style="fill: rgb(209, 144, 144); font-family: Arial, sans-serif; font-size: 6.8px; white-space: pre;" x="459.199" y="259.268" transform="matrix(1, 0, 0, 0.9999999999999999, 0, 2.842170943040401e-14)">Companion</text>
+  <path d="M 463.68 230.182 L 463.68 248.074 L 470.837 248.074 C 473.224 248.074 474.416 246.881 474.416 244.495 L 474.416 233.76 C 474.416 231.375 473.224 230.182 470.837 230.182 L 463.68 230.182 Z" style="fill: rgb(43, 191, 145);" transform="matrix(1, 0, 0, 0.9999999999999999, 0, 2.842170943040401e-14)"/>
+  <path d="M 466.083 233.94 L 466.083 243.94 L 470.083 243.94 C 471.417 243.94 472.083 243.273 472.083 241.94 L 472.083 235.94 C 472.083 234.607 471.417 233.94 470.083 233.94 L 466.083 233.94 Z" fill="#252536" transform="matrix(1, 0, 0, 0.9999999999999999, 0, 2.842170943040401e-14)"/>
+  <path d="M 473.491 235.484 L 478.824 243.484 L 473.491 251.484 L 477.046 251.484 L 480.601 245.484 L 484.156 251.484 L 487.711 251.484 L 482.379 243.484 L 487.711 235.484 L 484.156 235.484 L 480.601 241.484 L 477.046 235.484 L 473.491 235.484 Z" fill="#F0A732" style="" transform="matrix(1, 0, 0, 0.9999999999999999, 0, 2.842170943040401e-14)"/>
 </svg>
