@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonSubTypes({
     @JsonSubTypes.Type(name = "path", value = Path.class),
     @JsonSubTypes.Type(name = "action", value = Action.class),
+    @JsonSubTypes.Type(name = "script", value = Script.class),
     @JsonSubTypes.Type(name = "observedFile", value = ObservedFile.class),
 })
 public abstract class AbstractNode {

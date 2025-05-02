@@ -5,13 +5,11 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonShortcuts;
 import com.intellij.ui.treeStructure.Tree;
 import org.jetbrains.annotations.NotNull;
-import org.micoli.dxcompanion.configuration.models.AbstractNode;
-import org.micoli.dxcompanion.configuration.models.Action;
-import org.micoli.dxcompanion.configuration.models.ObservedFile;
-import org.micoli.dxcompanion.configuration.models.Path;
+import org.micoli.dxcompanion.configuration.models.*;
 import org.micoli.dxcompanion.ui.components.ActionNode;
 import org.micoli.dxcompanion.ui.components.DynamicTreeNode;
 import org.micoli.dxcompanion.ui.components.FileObserverToggle;
+import org.micoli.dxcompanion.ui.components.ScriptNode;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -41,6 +39,9 @@ public class ActionTreeFactory {
             DefaultMutableTreeNode treeNode;
             if(node instanceof Action){
                 parent.add(new ActionNode(tree, (Action) node));
+            }
+            if (node instanceof Script) {
+                parent.add(new ScriptNode(tree, (Script) node));
             }
             if(node instanceof ObservedFile){
                 parent.add(new FileObserverToggle(tree, (ObservedFile) node));

@@ -25,6 +25,11 @@ DX Companion is an IntelliJ IDEA plugin designed to enhance developer experience
        "type": "action",
        "label": "Build clean Project",
        "command": "mvn clean install"
+    },
+    {
+       "type": "script",
+       "label": "Display a message",
+       "source": "import static com.intellij.openapi.ui.Messages.showInfoMessage\n\nshowInfoMessage((3+2).toString(),\"test\")"
     }
   ]
 }
@@ -40,7 +45,7 @@ DX Companion is an IntelliJ IDEA plugin designed to enhance developer experience
 
 ### Action System
 - Creates custom buttons with configurable labels and icons
-- Executes defined shell commands in the terminal or executes registered action
+- Executes defined shell commands in the terminal, executes registered intellij action or execute a script through IdeScriptEngine
 - Supports specifying working directories for command execution
 
 ### Configuration
@@ -86,7 +91,7 @@ If both files are found, their configurations are merged.
 
 ## Schema
 
-The plugin supports three main node types:
+The plugin supports following main node types:
 
 1. Action Nodes
 
@@ -110,6 +115,18 @@ The plugin supports three main node types:
    }
    ```
    To help writing of `action:xxx` command, an autocompletion is available when editing `.dx-companion.json`
+2. Script Nodes
+
+   Script execute script source throught IdeScriptEngine:
+   ```json
+   {
+       "type": "script",
+       "label": "Start Application",
+       "source": "import static com.intellij.openapi.ui.Messages.showInfoMessage\n\nshowInfoMessage((3+2).toString(),\"test\")",
+       "icon": "debugger/threadRunning.svg"
+   }
+   ```
+   
 3. Observed File Nodes
 
    These nodes monitor configuration files (like .env) and allow toggling variables on/off by commenting/uncommenting:
@@ -172,6 +189,16 @@ The plugin supports three main node types:
 | `shortcut` | String | No | - | Keyboard shortcut (currently not implemented)                           |
 | `icon` | String | No | `debugger/threadRunning.svg` | Icon path for the action button                                         |
 
+### Script Properties
+
+| Property    | Type | Required | Default | Description                                                                               |
+|-------------|------|----------|---------|-------------------------------------------------------------------------------------------|
+| `label`     | String | No | `Action` | The display name for the action button                                                    |
+| `source`    | String | Yes | - | Script source                                                                             |
+| `extension` | String | Yes | - | Use to determinate script engine, default in "groovy" to use builtin groovy script engine |
+| `shortcut`  | String | No | - | Keyboard shortcut (currently not implemented)                                             |
+| `icon`      | String | No | `debugger/threadRunning.svg` | Icon path for the action button                                                           |
+
 ## Icon System
 
 DxCompanion uses IntelliJ's built-in icon system. You can specify icons from the IntelliJ icon library by using their path. Some common icon paths include:
@@ -207,6 +234,11 @@ DxCompanion uses IntelliJ's built-in icon system. You can specify icons from the
       "commentPrefix": "#",
       "activeIcon": "actions/execute.svg",
       "inactiveIcon": "actions/suspend.svg"
+    },
+    {
+      "type": "script",
+      "label": "Display a message",
+      "source": "import static com.intellij.openapi.ui.Messages.showInfoMessage\n\nshowInfoMessage((3+2).toString(),\"test\")"
     },
     {
       "label": "Docker Compose",
