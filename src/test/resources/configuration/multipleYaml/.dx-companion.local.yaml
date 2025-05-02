@@ -1,0 +1,5 @@
+nodes:
+  - type: action
+    label: "action at root"
+    command: "sleep 3;exit"
+    shortcut: "ctrl alt n"

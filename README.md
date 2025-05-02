@@ -38,7 +38,7 @@ DX Companion is an IntelliJ IDEA plugin designed to enhance developer experience
 ## Features
 
 ### File Observation System
-- Monitors specific configuration files defined in `.dx-companion.json`
+- Monitors specific configuration files defined in `.dx-companion.json`/`.dx-companion.yaml`
 - Visually indicates whether specific variables are active or commented out
 - Allows one-click toggling between active and inactive states
 - Handles different comment prefixes for various file types
@@ -49,7 +49,7 @@ DX Companion is an IntelliJ IDEA plugin designed to enhance developer experience
 - Supports specifying working directories for command execution
 
 ### Configuration
-The plugin uses a JSON configuration file (`.dx-companion.json`) in the project root directory, which defines:
+The plugin uses a JSON/YAML configuration file (`.dx-companion.json`/`.dx-companion.yaml`) in the project root directory, which defines:
 - Files to observe with their paths and variable names
 - Custom shell commands with labels and icons
 
@@ -78,14 +78,14 @@ This tool serves as a companion for developers to streamline common tasks and re
 
 ## Overview
 
-The `.dx-companion.json` file is the core configuration file for the DxCompanion IntelliJ plugin. It defines the files to observe for toggling and the shell commands that can be executed from the plugin's tool window.
+The `.dx-companion.json`/`.dx-companion.yaml` file is the core configuration file for the DxCompanion IntelliJ plugin. It defines the files to observe for toggling and the shell commands that can be executed from the plugin's tool window.
 
 ## Configuration
 
 The plugin is driven by JSON configuration files located in the project root:
 
-- Primary configuration file: `.dx-companion.json`
-- Local override configuration: `.dx-companion.local.json`
+- Primary configuration file: `.dx-companion.json`/`.dx-companion.yaml`
+- Local override configuration: `.dx-companion.local.json`/`.dx-companion.local.yaml`
 
 If both files are found, their configurations are merged.
 
@@ -318,8 +318,8 @@ This allows for quick execution of common development tasks directly from the ID
 
 If the plugin encounters issues with your configuration file, it will display an error message in the tool window. Common issues include:
 
-- Missing `.dx-companion.json` file in project root
-- Invalid JSON syntax
+- Missing `.dx-companion.json`/`.dx-companion.yaml` file in project root
+- Invalid JSON/YAML syntax
 - Missing required properties
 
 The plugin automatically reloads the configuration every 2 seconds, so changes to the configuration file will be reflected without restarting the IDE.

@@ -1,0 +1,26 @@
+nodes:
+    - type: action
+      label: simple action label
+      command: sleep 3;exit
+    - type: action
+      label: actionId action
+      command: action:IdeScriptingConsole
+    - type: observedFile
+      label: button label
+      filePath: .env
+      variableName: BB
+      shortcut: ctrl shift n
+    - type: path
+      label: empty path
+    - type: path
+      label: path
+      nodes:
+          - type: path
+            label: subpath
+            nodes:
+                - type: action
+                  label: action in path.subpath
+                  command: sleep 3;exit
+                  shortcut: ctrl alt l
+          - type: path
+            label: other subpath

@@ -7,7 +7,6 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Test;
 import org.micoli.dxcompanion.configuration.models.AbstractNode;
-import org.micoli.dxcompanion.configuration.models.Configuration;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,13 +30,29 @@ public class ConfigurationFactoryTest {
     }
 
     @Test
+    public void testItReportErroneousYamlConfiguration() {
+        ConfigurationException exception = assertThrows(ConfigurationException.class, () -> ConfigurationFactory.get(getConfigurationPath("erroneousYamlConfiguration").getAbsolutePath()));
+        Assert.assertTrue(exception.getMessage().contains("in 'reader', line 2, column 5:"));
+    }
+
+    @Test
     public void testItSucceedsToLoadASimpleConfiguration() throws Exception {
         testSuccessfullConfiguration("simple");
     }
 
     @Test
+    public void testItSucceedsToLoadASimpleYamlConfiguration() throws Exception {
+        testSuccessfullConfiguration("simpleYaml");
+    }
+
+    @Test
     public void testItSucceedsToLoadAMultipleFileConfiguration() throws Exception {
         testSuccessfullConfiguration("multiple");
+    }
+
+    @Test
+    public void testItSucceedsToLoadAMultipleFileYamlConfiguration() throws Exception {
+        testSuccessfullConfiguration("multipleYaml");
     }
 
     private void testSuccessfullConfiguration(String testPath) throws ConfigurationException, IOException {

@@ -1,0 +1,67 @@
+{
+  "nodes": [
+    {
+      "type": "action",
+      "label": "simple action label",
+      "command": "sleep 3;exit",
+      "cwd": null,
+      "shortcut": null,
+      "icon": "debugger/threadRunning.svg"
+    },
+    {
+      "type": "action",
+      "label": "actionId action",
+      "command": "action:IdeScriptingConsole",
+      "cwd": null,
+      "shortcut": null,
+      "icon": "debugger/threadRunning.svg"
+    },
+    {
+      "type": "observedFile",
+      "label": "button label",
+      "commentPrefix": "#",
+      "filePath": ".env",
+      "variableName": "BB",
+      "shortcut": "ctrl shift n",
+      "activeIcon": "actions/inlayRenameInComments.svg",
+      "inactiveIcon": "actions/inlayRenameInCommentsActive.svg",
+      "unknownIcon": "expui/fileTypes/unknown.svg"
+    },
+    {
+      "type": "path",
+      "label": "empty path",
+      "nodes": null
+    },
+    {
+      "type": "path",
+      "label": "path",
+      "nodes": [
+        {
+          "type": "path",
+          "label": "subpath",
+          "nodes": [
+            {
+              "type": "action",
+              "label": "action in path.subpath",
+              "command": "sleep 3;exit",
+              "cwd": null,
+              "shortcut": "ctrl alt l",
+              "icon": "debugger/threadRunning.svg"
+            }
+          ]
+        },
+        {
+          "type": "path",
+          "label": "other subpath",
+          "nodes": null
+        }
+      ]
+    },
+    {
+      "type": "action",
+      "label": "action at root",
+      "command": "sleep 3;exit",
+      "shortcut": "ctrl alt n"
+    }
+  ]
+}
