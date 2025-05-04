@@ -71,15 +71,10 @@ public class RunnableAction implements Runnable {
         }
 
         try {
-            Editor activeEditor = FileEditorManager.getInstance(ProjectManager.getInstance().getOpenProjects()[0]).getSelectedTextEditor();
-            DataContext dataContext = DataManager.getInstance().getDataContext(activeEditor != null ? activeEditor.getComponent() : this.component);
-            AnActionEvent actionEvent = AnActionEvent.createFromAnAction(
-                action,
-                null,
-                ActionPlaces.UNKNOWN,
-                dataContext
-            );
-            ActionUtil.performActionDumbAwareWithCallbacks(action, actionEvent);
+            Project openProject = ProjectManager.getInstance().getOpenProjects()[0];
+            Editor activeEditor = FileEditorManager.getInstance(openProject).getSelectedTextEditor();
+
+            ActionManager.getInstance().tryToExecute(action, null, activeEditor.getComponent(), ActionPlaces.UNKNOWN, true);
         } catch (Exception e) {
             Notification.error(String.format("Error while executing '%s' : %s", actionId, e.getMessage()));
         }
