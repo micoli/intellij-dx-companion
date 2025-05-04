@@ -3,19 +3,24 @@ package org.micoli.dxcompanion.ui.components;
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.ex.ActionUtil;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.terminal.ui.TerminalWidget;
+import org.jetbrains.plugins.terminal.TerminalToolWindowFactory;
 import org.jetbrains.plugins.terminal.TerminalToolWindowManager;
 import org.micoli.dxcompanion.configuration.models.Action;
 import org.micoli.dxcompanion.ui.Notification;
 
 import java.awt.Component;
-import java.io.IOException;
 
 public class RunnableAction implements Runnable {
+
     private static final Logger LOGGER = Logger.getInstance(ActionNode.class);
     public static final String ACTION_PREFIX = "action:";
     private final Component component;
@@ -37,15 +42,23 @@ public class RunnableAction implements Runnable {
 
     private static void runShellAction(Action action) {
         Project project = ProjectManager.getInstance().getOpenProjects()[0];
-        String cwd = action.cwd != null ? action.cwd : project.getBasePath();
-        try {
-            TerminalToolWindowManager
-                .getInstance(project)
-                .createLocalShellWidget(cwd, action.label)
-                .executeCommand(action.command);
-        } catch (IOException e) {
-            LOGGER.error(e);
+
+        TerminalWidget terminalWidget = TerminalToolWindowManager
+            .getInstance(project)
+            .createShellWidget(action.cwd != null ? action.cwd : project.getBasePath(), action.label, true, true);
+
+        ToolWindow window = ToolWindowManager.getInstance(project).getToolWindow(TerminalToolWindowFactory.TOOL_WINDOW_ID);
+        if (window == null) {
+            return;
         }
+        if (!window.isActive()) {
+            window.activate(null);
+        }
+
+        ApplicationManager.getApplication().invokeLater(() -> {
+            terminalWidget
+                .sendCommandToExecute(action.command);
+        });
     }
 
     private void runBuiltinAction(String actionId) {
