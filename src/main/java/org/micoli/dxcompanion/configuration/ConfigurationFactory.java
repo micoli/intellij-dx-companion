@@ -11,8 +11,6 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -22,29 +20,24 @@ import java.io.FileReader;
 public class ConfigurationFactory {
     public static class LoadedConfiguration {
         public Configuration configuration;
-        public String serial;
+        public Long timestamp;
 
-        private LoadedConfiguration(Configuration configuration, String serial) {
+        private LoadedConfiguration(Configuration configuration, Long timestamp) {
             this.configuration = configuration;
-            this.serial = serial;
+            this.timestamp = timestamp;
         }
     }
 
-    private static final MessageDigest messageDigest;
     public static final ArrayList<String> acceptableConfigurationFiles = new ArrayList<>(Arrays.asList(".dx-companion.json", ".dx-companion.yaml", ".dx-companion.local.json", ".dx-companion.local.yaml"));
 
-    static {
-        try {
-            messageDigest = MessageDigest.getInstance("MD5");
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static LoadedConfiguration get(String projectPath) throws ConfigurationException {
+    public static LoadedConfiguration get(String projectPath, Long previousLatestFileTimestampUpdate) throws ConfigurationException {
         List<String> files = acceptableConfigurationFiles.stream().filter((configurationFile) -> new File(projectPath, configurationFile).exists()).toList();
         if (files.isEmpty()) {
-            throw new ConfigurationException("No .dx-companion(.*).json configuration file(s) found.");
+            throw new ConfigurationException("No .dx-companion(.*).json configuration file(s) found.", 0L);
+        }
+        long latestFileUpdateTimestamp = getLatestFileTimestampUpdate(projectPath, files);
+        if (previousLatestFileTimestampUpdate == latestFileUpdateTimestamp) {
+            return null;
         }
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
@@ -54,10 +47,13 @@ public class ConfigurationFactory {
             stringContent = loadConfigurationFiles(projectPath, files);
             return new LoadedConfiguration(
                 objectMapper.readValue(stringContent, Configuration.class),
-                Arrays.toString(messageDigest.digest(stringContent.getBytes(StandardCharsets.UTF_8)))
+                latestFileUpdateTimestamp
             );
         } catch (Exception e) {
-            throw new ConfigurationException(e.getClass().descriptorString() + "-" + e.getMessage() + "\\n" + stringContent);
+            throw new ConfigurationException(
+                e.getClass().descriptorString() + "-" + e.getMessage() + "\\n" + stringContent,
+                latestFileUpdateTimestamp
+            );
         }
     }
 
@@ -81,5 +77,13 @@ public class ConfigurationFactory {
             GsonTools.extendJsonObject(mergedJson, GsonTools.ConflictStrategy.PREFER_SECOND_OBJ, jsonFile.getAsJsonObject());
         }
         return mergedJson.toString();
+    }
+
+    private static long getLatestFileTimestampUpdate(String projectPath, List<String> files) {
+        long max = 0L;
+        for (String file : files) {
+            max = Long.max(max, new File(projectPath, file).lastModified());
+        }
+        return max;
     }
 }

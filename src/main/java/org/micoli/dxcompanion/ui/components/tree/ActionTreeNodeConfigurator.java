@@ -7,8 +7,7 @@ import com.intellij.ui.treeStructure.Tree;
 import org.jetbrains.annotations.NotNull;
 import org.micoli.dxcompanion.configuration.models.*;
 import org.micoli.dxcompanion.ui.components.ActionNode;
-import org.micoli.dxcompanion.ui.components.DynamicTreeNode;
-import org.micoli.dxcompanion.ui.components.FileObserverToggle;
+import org.micoli.dxcompanion.ui.components.FileObserverNode;
 import org.micoli.dxcompanion.ui.components.ScriptNode;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -17,40 +16,52 @@ import javax.swing.tree.TreePath;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class ActionTreeFactory {
-    public Tree treeBuilder(AbstractNode[] nodes) {
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode("Actions");
-        Tree tree = new Tree(new DefaultTreeModel(root));
-        tree.setCellRenderer(new TreeCellRenderer());
-        addSubNodes(tree, root, nodes);
+public class ActionTreeNodeConfigurator {
+    private final Tree tree;
+    private final DefaultTreeModel treeModel;
+    private final DefaultMutableTreeNode root;
 
-        for (int i = 0; i < tree.getRowCount(); i++) {
-            tree.expandRow(i);
-        }
+    public ActionTreeNodeConfigurator(Tree tree){
+        this.tree = tree;
+        this.treeModel = (DefaultTreeModel) tree.getModel();
+        this.root = (DefaultMutableTreeNode) treeModel.getRoot();
+    }
+
+    public void configureTree(AbstractNode[] nodes) {
+
+        root.removeAllChildren();
+
+        addSubNodes(tree, root, nodes);
 
         registerDoubleClickAction(tree);
         registerEnterKeyAction(tree);
 
-        return tree;
+        TreeUtils.forEachLeaf(tree, (node, path) -> {
+            treeModel.nodeChanged(node);
+        });
+
+        for (int i = 0; i < tree.getRowCount(); i++) {
+            tree.expandRow(i);
+        }
     }
 
-    private void addSubNodes(Tree tree, DefaultMutableTreeNode parent,AbstractNode[] nodes) {
-        for(AbstractNode node: nodes){
+    private void addSubNodes(Tree tree, DefaultMutableTreeNode parent, AbstractNode[] nodes) {
+        for (AbstractNode node : nodes) {
             DefaultMutableTreeNode treeNode;
-            if(node instanceof Action){
+            if (node instanceof Action) {
                 parent.add(new ActionNode(tree, (Action) node));
             }
             if (node instanceof Script) {
                 parent.add(new ScriptNode(tree, (Script) node));
             }
-            if(node instanceof ObservedFile){
-                parent.add(new FileObserverToggle(tree, (ObservedFile) node));
+            if (node instanceof ObservedFile) {
+                parent.add(new FileObserverNode(tree, (ObservedFile) node));
             }
-            if(node instanceof Path){
+            if (node instanceof Path) {
                 treeNode = new DefaultMutableTreeNode(node.label);
                 parent.add(treeNode);
                 AbstractNode[] subNodes = ((Path) node).nodes;
-                if(subNodes==null){
+                if (subNodes == null) {
                     continue;
                 }
                 addSubNodes(tree, treeNode, subNodes);
@@ -91,7 +102,7 @@ public class ActionTreeFactory {
 
     private void handleLeafAction(DefaultMutableTreeNode node, Tree tree) {
         if (node == null) return;
-        if (node instanceof DynamicTreeNode dynamicTreeNode){
+        if (node instanceof DynamicTreeNode dynamicTreeNode) {
             dynamicTreeNode.getAction().run();
             return;
         }

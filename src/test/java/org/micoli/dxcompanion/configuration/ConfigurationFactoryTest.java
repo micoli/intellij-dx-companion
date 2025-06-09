@@ -19,19 +19,19 @@ import static org.junit.Assert.assertThrows;
 public class ConfigurationFactoryTest {
     @Test
     public void testItReportEmptyConfiguration() {
-        ConfigurationException exception = assertThrows(ConfigurationException.class, () -> ConfigurationFactory.get(getConfigurationPath("empty").getAbsolutePath()));
+        ConfigurationException exception = assertThrows(ConfigurationException.class, () -> ConfigurationFactory.get(getConfigurationPath("empty").getAbsolutePath(),0L));
         Assert.assertSame("No .dx-companion(.*).json configuration file(s) found.", exception.getMessage());
     }
 
     @Test
     public void testItReportErroneousConfiguration() {
-        ConfigurationException exception = assertThrows(ConfigurationException.class, () -> ConfigurationFactory.get(getConfigurationPath("erroneousConfiguration").getAbsolutePath()));
+        ConfigurationException exception = assertThrows(ConfigurationException.class, () -> ConfigurationFactory.get(getConfigurationPath("erroneousConfiguration").getAbsolutePath(),0L));
         Assert.assertTrue(exception.getMessage().contains("com.google.gson.stream.MalformedJsonException: Expected ':'"));
     }
 
     @Test
     public void testItReportErroneousYamlConfiguration() {
-        ConfigurationException exception = assertThrows(ConfigurationException.class, () -> ConfigurationFactory.get(getConfigurationPath("erroneousYamlConfiguration").getAbsolutePath()));
+        ConfigurationException exception = assertThrows(ConfigurationException.class, () -> ConfigurationFactory.get(getConfigurationPath("erroneousYamlConfiguration").getAbsolutePath(),0L));
         Assert.assertTrue(exception.getMessage().contains("in 'reader', line 2, column 5:"));
     }
 
@@ -62,7 +62,7 @@ public class ConfigurationFactoryTest {
         File file = getConfigurationPath(testPath);
 
         // When
-        ConfigurationFactory.LoadedConfiguration createdConfiguration = ConfigurationFactory.get(file.getAbsolutePath());
+        ConfigurationFactory.LoadedConfiguration createdConfiguration = ConfigurationFactory.get(file.getAbsolutePath(),0L);
 
         //Then
         objectMapper.registerSubtypes(AbstractNode.class);

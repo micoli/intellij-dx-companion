@@ -3,7 +3,6 @@ package org.micoli.dxcompanion.ui;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.concurrency.AppExecutorUtil;
@@ -12,11 +11,16 @@ import org.jetbrains.annotations.NotNull;
 import org.micoli.dxcompanion.configuration.ConfigurationException;
 import org.micoli.dxcompanion.configuration.ConfigurationFactory;
 import org.micoli.dxcompanion.configuration.models.Action;
+import org.micoli.dxcompanion.configuration.models.ObservedFile;
+import org.micoli.dxcompanion.configuration.models.RunnableNode;
+import org.micoli.dxcompanion.configuration.models.Script;
 import org.micoli.dxcompanion.ui.components.*;
-import org.micoli.dxcompanion.ui.components.tree.ActionTreeFactory;
-import org.micoli.dxcompanion.ui.components.tree.TreeUtils;
+import org.micoli.dxcompanion.ui.components.ActionToolbarButton;
+import org.micoli.dxcompanion.ui.components.tree.*;
 
 import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import java.awt.*;
 import java.util.concurrent.TimeUnit;
 
@@ -26,8 +30,8 @@ class ToolWindowContent {
     public final JPanel contentPanel = new JPanel();
     private final JComponent mainPanel = new JPanel();
     private Tree tree;
-    private String serial = null;
-    private final ActionTreeFactory actionTreeFactory = new ActionTreeFactory();
+    private Long configurationTimestamp = 0L;
+    private final ActionTreeNodeConfigurator actionTreeNodeConfigurator;
     private final DefaultActionGroup leftActionGroup = new DefaultActionGroup();
 
     public ToolWindowContent(Project project) {
@@ -37,6 +41,12 @@ class ToolWindowContent {
         this.contentPanel.add(createToolbar(), BorderLayout.NORTH);
         this.mainPanel.setLayout(new BorderLayout());
         this.project = project;
+        this.tree = new Tree(new DefaultTreeModel(new DefaultMutableTreeNode("Actions")));
+        this.tree.setCellRenderer(new TreeCellRenderer());
+        JBScrollPane comp = new JBScrollPane(this.tree);
+        comp.setBorder(JBUI.Borders.empty());
+        this.mainPanel.add(comp, BorderLayout.CENTER);
+        this.actionTreeNodeConfigurator = new ActionTreeNodeConfigurator(this.tree);
         AppExecutorUtil.getAppScheduledExecutorService().scheduleWithFixedDelay(() -> {
             updateMainPanel();
             refreshComponents();
@@ -45,52 +55,50 @@ class ToolWindowContent {
     }
 
     private void refreshComponents() {
-        if (this.tree == null) {
-            return;
-        }
         TreeUtils.forEachLeaf(this.tree, (node, path) -> {
-            if (node instanceof FileObserverToggle fileObserverToggle) {
+            if (node instanceof FileObserverNode fileObserverToggle) {
                 fileObserverToggle.check();
             }
         });
+        for (AnAction action : this.leftActionGroup.getChildActionsOrStubs()) {
+            if (action instanceof FileObserverToolbarButton fileObserverToggle) {
+                fileObserverToggle.check();
+            }
+        }
     }
 
     private void updateMainPanel() {
         try {
-            ConfigurationFactory.LoadedConfiguration loadedConfiguration = ConfigurationFactory.get(project.getBasePath());
-            if (loadedConfiguration.serial.equals(serial)) {
+            ConfigurationFactory.LoadedConfiguration loadedConfiguration = ConfigurationFactory.get(project.getBasePath(), configurationTimestamp);
+            if (loadedConfiguration == null) {
                 return;
             }
-            removeAllComponents();
-            serial = loadedConfiguration.serial;
+            this.configurationTimestamp = loadedConfiguration.timestamp;
 
             this.loadButtonBar(loadedConfiguration);
             this.loadActionTree(loadedConfiguration);
 
             LOGGER.debug("MainPanel reloaded");
+            // Notification.message("DX Companion reloaded");
         } catch (ConfigurationException e) {
-            removeAllComponents();
-            this.tree = null;
-            this.serial = null;
-            JTextArea errorTextArea = new JTextArea(e.getMessage());
-            errorTextArea.setEditable(false);
-            errorTextArea.setLineWrap(true);
-            errorTextArea.setWrapStyleWord(true);
-            errorTextArea.setForeground(JBColor.RED);
-            errorTextArea.setFont(new Font("Dialog", Font.PLAIN, 12));
-            this.mainPanel.add(errorTextArea, BorderLayout.CENTER);
+            if (!this.configurationTimestamp.equals(e.serial)) {
+                Notification.error(e.getMessage());
+                this.configurationTimestamp = e.serial;
+            }
         }
     }
 
     private void loadActionTree(ConfigurationFactory.LoadedConfiguration loadedConfiguration) {
         if (loadedConfiguration.configuration.nodes == null) {
-            this.mainPanel.add(new Panel(), BorderLayout.CENTER);
             return;
         }
-        this.tree = actionTreeFactory.treeBuilder(loadedConfiguration.configuration.nodes.clone());
-        JBScrollPane comp = new JBScrollPane(this.tree);
-        comp.setBorder(JBUI.Borders.empty());
-        this.mainPanel.add(comp, BorderLayout.CENTER);
+        TreeUtils.forEachLeaf(tree, (node, path) -> {
+            if (node instanceof DynamicTreeNode dynamicTreeNode) {
+                dynamicTreeNode.unregisterShortcut();
+            }
+        });
+
+        actionTreeNodeConfigurator.configureTree(loadedConfiguration.configuration.nodes.clone());
     }
 
     private void loadButtonBar(ConfigurationFactory.LoadedConfiguration loadedConfiguration) {
@@ -98,22 +106,19 @@ class ToolWindowContent {
         if (loadedConfiguration.configuration.toolbarButtons == null) {
             return;
         }
-        for (Action button : loadedConfiguration.configuration.toolbarButtons.clone()) {
-            this.leftActionGroup.add(new ActionToolbarButton(this.mainPanel, button));
+        for (RunnableNode button : loadedConfiguration.configuration.toolbarButtons.clone()) {
+            if (button instanceof Action action) {
+                this.leftActionGroup.add(new ActionToolbarButton(this.mainPanel, action));
+            }
+            if (button instanceof Script script) {
+                this.leftActionGroup.add(new ScriptToolbarButton(this.mainPanel, script));
+            }
+            if (button instanceof ObservedFile observedFile) {
+                this.leftActionGroup.add(new FileObserverToolbarButton(observedFile));
+            }
         }
     }
 
-    private void removeAllComponents() {
-        if (this.tree == null) {
-            return;
-        }
-        TreeUtils.forEachLeaf(this.tree, (node, path) -> {
-            if (node instanceof DynamicTreeNode dynamicTreeNode) {
-                dynamicTreeNode.unregisterShortcut();
-            }
-        });
-        this.mainPanel.removeAll();
-    }
 
     private JComponent createToolbar() {
         JPanel toolbarPanel = new JPanel(new BorderLayout());

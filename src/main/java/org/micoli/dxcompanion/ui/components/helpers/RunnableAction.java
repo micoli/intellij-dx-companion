@@ -1,8 +1,9 @@
-package org.micoli.dxcompanion.ui.components;
+package org.micoli.dxcompanion.ui.components.helpers;
 
-import com.intellij.ide.DataManager;
+import com.intellij.ide.script.IdeScriptEngine;
+import com.intellij.ide.script.IdeScriptEngineManager;
+import com.intellij.ide.script.IdeScriptException;
 import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.actionSystem.ex.ActionUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
@@ -15,7 +16,11 @@ import com.intellij.terminal.ui.TerminalWidget;
 import org.jetbrains.plugins.terminal.TerminalToolWindowFactory;
 import org.jetbrains.plugins.terminal.TerminalToolWindowManager;
 import org.micoli.dxcompanion.configuration.models.Action;
+import org.micoli.dxcompanion.configuration.models.ObservedFile;
+import org.micoli.dxcompanion.configuration.models.RunnableNode;
+import org.micoli.dxcompanion.configuration.models.Script;
 import org.micoli.dxcompanion.ui.Notification;
+import org.micoli.dxcompanion.ui.components.ActionNode;
 
 import java.awt.Component;
 
@@ -24,20 +29,45 @@ public class RunnableAction implements Runnable {
     private static final Logger LOGGER = Logger.getInstance(ActionNode.class);
     public static final String ACTION_PREFIX = "action:";
     private final Component component;
-    private final Action action;
+    private final RunnableNode runnableNode;
 
-    public RunnableAction(Component component, Action action) {
+    public RunnableAction(Component component, RunnableNode runnableNode) {
         this.component = component;
-        this.action = action;
+        this.runnableNode = runnableNode;
     }
 
     @Override
     public void run() {
-        if (action.command.startsWith(ACTION_PREFIX)) {
-            runBuiltinAction(action.command.replaceFirst(ACTION_PREFIX, ""));
+        if (runnableNode instanceof Action action){
+            if (action.command.startsWith(ACTION_PREFIX)) {
+                runBuiltinAction(action.command.replaceFirst(ACTION_PREFIX, ""));
+                return;
+            }
+            runShellAction(action);
+        }
+        if (runnableNode instanceof Script script){
+            runScript(script);
+        }
+        if (runnableNode instanceof ObservedFile observedFile){
+            toggleObservedFile(observedFile);
+        }
+    }
+
+    private void toggleObservedFile(ObservedFile observedFile) {
+        new FileObserver(observedFile).toggle();
+    }
+
+    private void runScript(Script script) {
+        IdeScriptEngine engine = IdeScriptEngineManager.getInstance().getEngineByFileExtension(script.extension, null);
+        if (engine == null) {
+            Notification.error(String.format("Script engine with extension '%s' is not found", script.extension));
             return;
         }
-        runShellAction(action);
+        try {
+            engine.eval(script.source);
+        } catch (IdeScriptException e) {
+            Notification.error(String.format(e.getMessage()));
+        }
     }
 
     private static void runShellAction(Action action) {

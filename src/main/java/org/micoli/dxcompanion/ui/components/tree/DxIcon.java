@@ -1,4 +1,4 @@
-package org.micoli.dxcompanion.ui.components;
+package org.micoli.dxcompanion.ui.components.tree;
 
 import com.intellij.openapi.util.IconLoader;
 

@@ -1,7 +1,10 @@
 package org.micoli.dxcompanion.configuration;
 
 public class ConfigurationException extends Exception {
-    public ConfigurationException(String message) {
+    public final Long serial;
+
+    public ConfigurationException(String message, Long serial) {
         super(message);
+        this.serial = serial;
     }
 }

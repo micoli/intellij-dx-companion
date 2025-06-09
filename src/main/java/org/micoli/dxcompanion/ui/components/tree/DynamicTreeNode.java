@@ -1,4 +1,4 @@
-package org.micoli.dxcompanion.ui.components;
+package org.micoli.dxcompanion.ui.components.tree;
 
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
@@ -7,6 +7,7 @@ import com.intellij.ui.treeStructure.Tree;
 import org.micoli.dxcompanion.configuration.models.AbstractNode;
 import org.micoli.dxcompanion.configuration.models.Action;
 import org.micoli.dxcompanion.configuration.models.ObservedFile;
+import org.micoli.dxcompanion.ui.components.helpers.DynamicShortcutAction;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -20,7 +21,7 @@ public class DynamicTreeNode extends DefaultMutableTreeNode {
     private Runnable action;
     protected final Tree tree;
 
-    DynamicTreeNode(Tree tree, AbstractNode configurationNode, Icon icon) {
+    public DynamicTreeNode(Tree tree, AbstractNode configurationNode, Icon icon) {
         super(configurationNode);
         this.tree = tree;
         this.label = configurationNode.label;

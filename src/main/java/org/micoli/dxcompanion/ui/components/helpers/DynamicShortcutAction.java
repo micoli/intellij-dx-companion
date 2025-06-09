@@ -1,4 +1,4 @@
-package org.micoli.dxcompanion.ui.components;
+package org.micoli.dxcompanion.ui.components.helpers;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;

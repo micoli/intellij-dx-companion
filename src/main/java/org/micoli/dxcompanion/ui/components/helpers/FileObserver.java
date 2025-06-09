@@ -1,62 +1,45 @@
-package org.micoli.dxcompanion.ui.components;
+package org.micoli.dxcompanion.ui.components.helpers;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.IconLoader;
-import com.intellij.ui.treeStructure.Tree;
 import org.micoli.dxcompanion.configuration.models.ObservedFile;
 import org.micoli.dxcompanion.ui.Notification;
+import org.micoli.dxcompanion.ui.components.tree.DxIcon;
 
-import javax.swing.tree.DefaultTreeModel;
+import javax.swing.*;
 import java.io.*;
 
-public class FileObserverToggle extends DynamicTreeNode {
-    private static final Logger LOGGER = Logger.getInstance(FileObserverToggle.class);
+public class FileObserver {
+    public static final class IconAndLabel{
+        public Icon icon;
+        public String label;
+
+        IconAndLabel(Icon icon, String label){
+            this.icon = icon;
+            this.label = label;
+        }
+    }
+    private static final Logger LOGGER = Logger.getInstance(FileObserver.class);
     private final String root;
-    final ObservedFile observedFile;
+    public final ObservedFile observedFile;
     final String activeRegularExpression;
     final String disabledRegularExpression;
 
-    private enum Status {
+    public enum Status {
         Active, Inactive, Unknown
     }
     Status status;
 
-    public FileObserverToggle(Tree tree, ObservedFile observedFile) {
-        super(tree, observedFile, IconLoader.getIcon(observedFile.unknownIcon, DxIcon.class));
+    public FileObserver(ObservedFile observedFile) {
         this.root = ProjectManager.getInstance().getOpenProjects()[0].getBasePath();
         this.observedFile = observedFile;
         activeRegularExpression = "^" + observedFile.variableName + "=";
         disabledRegularExpression = "^" + observedFile.commentPrefix + "\\s*" + observedFile.variableName + "=";
-
-        setAction(this::toggle);
-        registerShortcut(observedFile.label, observedFile.shortcut, this::toggle);
         status = getStatus();
     }
 
-    public void check() {
-        Status oldStatus = status;
-        status = getStatus();
-        switch (status) {
-            case Active:
-                setLabel(observedFile.label);
-                setIcon(IconLoader.getIcon(observedFile.activeIcon, DxIcon.class));
-                break;
-            case Inactive:
-                setLabel("# " + observedFile.label);
-                setIcon(IconLoader.getIcon(observedFile.inactiveIcon, DxIcon.class));
-                break;
-            case Unknown:
-                setLabel(observedFile.label + " not present");
-                setIcon(IconLoader.getIcon(observedFile.unknownIcon, DxIcon.class));
-                break;
-        }
-        if (!status.equals(oldStatus)){
-            ((DefaultTreeModel)tree.getModel()).reload(this);
-        }
-    }
-
-    void toggle() {
+    public void toggle() {
         switch (getStatus()) {
             case Active:
                 replaceInFile(false);
@@ -65,10 +48,26 @@ public class FileObserverToggle extends DynamicTreeNode {
                 replaceInFile(true);
                 break;
         }
-        check();
     }
 
-    private Status getStatus() {
+    public IconAndLabel getIconAndLabel() {
+        return switch (this.getStatus()) {
+            case Active -> new IconAndLabel(
+                IconLoader.getIcon(observedFile.activeIcon, DxIcon.class),
+                observedFile.label
+            );
+            case Inactive -> new IconAndLabel(
+                IconLoader.getIcon(observedFile.inactiveIcon, DxIcon.class),
+                "# " + observedFile.label
+            );
+            case Unknown -> new IconAndLabel(
+                IconLoader.getIcon(observedFile.unknownIcon, DxIcon.class),
+                observedFile.label + " not present"
+            );
+        };
+
+    }
+    public Status getStatus() {
         File file = new File(root, observedFile.filePath);
         if (!file.exists()) {
             return Status.Unknown;
@@ -98,7 +97,7 @@ public class FileObserverToggle extends DynamicTreeNode {
         return result;
     }
 
-    private void replaceInFile(boolean toActive) {
+    public void replaceInFile(boolean toActive) {
         File file = new File(root, observedFile.filePath);
         if (!file.exists()) {
             return;
