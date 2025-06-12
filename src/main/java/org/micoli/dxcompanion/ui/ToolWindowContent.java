@@ -75,11 +75,13 @@ class ToolWindowContent {
             }
             this.configurationTimestamp = loadedConfiguration.timestamp;
 
-            this.loadButtonBar(loadedConfiguration);
-            this.loadActionTree(loadedConfiguration);
+            SwingUtilities.invokeLater(() -> {
+                this.loadButtonBar(loadedConfiguration);
+                this.loadActionTree(loadedConfiguration);
 
-            LOGGER.debug("MainPanel reloaded");
-            // Notification.message("DX Companion reloaded");
+                LOGGER.debug("MainPanel reloaded");
+                // Notification.message("DX Companion reloaded");
+            });
         } catch (ConfigurationException e) {
             if (!this.configurationTimestamp.equals(e.serial)) {
                 Notification.error(e.getMessage());

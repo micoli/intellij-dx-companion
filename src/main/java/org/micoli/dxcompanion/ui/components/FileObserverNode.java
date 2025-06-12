@@ -8,6 +8,7 @@ import org.micoli.dxcompanion.ui.components.tree.DxIcon;
 import org.micoli.dxcompanion.ui.components.tree.DynamicTreeNode;
 import org.micoli.dxcompanion.ui.components.helpers.FileObserver;
 
+import javax.swing.*;
 import javax.swing.tree.DefaultTreeModel;
 
 public class FileObserverNode extends DynamicTreeNode {
@@ -31,7 +32,9 @@ public class FileObserverNode extends DynamicTreeNode {
             FileObserver.IconAndLabel iconAndLabel = this.fileObserver.getIconAndLabel();
             setLabel(iconAndLabel.label);
             setIcon(iconAndLabel.icon);
-            ((DefaultTreeModel)tree.getModel()).reload(this);
+            SwingUtilities.invokeLater(() -> {
+                ((DefaultTreeModel) tree.getModel()).reload(this);
+            });
         }
     }
 

@@ -71,7 +71,9 @@ public class DynamicTreeNode extends DefaultMutableTreeNode {
             DxIcon.Execute,
             commandAction
         );
-
+        if (ActionManager.getInstance().getAction(actionId) != null) {
+            return;
+        }
         ActionManager.getInstance().registerAction(actionId, action);
         KeymapManager.getInstance().getActiveKeymap().addShortcut(actionId, parseKeyboardShortcut(shortcut));
     }
