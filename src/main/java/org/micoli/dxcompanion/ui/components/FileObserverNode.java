@@ -16,6 +16,7 @@ public class FileObserverNode extends DynamicTreeNode {
     private final FileObserver fileObserver;
 
     FileObserver.Status status;
+    private boolean firstCheck = true;
 
     public FileObserverNode(Tree tree, ObservedFile observedFile) {
         super(tree, observedFile, IconLoader.getIcon(observedFile.unknownIcon, DxIcon.class));
@@ -28,7 +29,7 @@ public class FileObserverNode extends DynamicTreeNode {
     public void check() {
         FileObserver.Status oldStatus = status;
         status = this.fileObserver.getStatus();
-        if (!status.equals(oldStatus)){
+        if (firstCheck || !status.equals(oldStatus)) {
             FileObserver.IconAndLabel iconAndLabel = this.fileObserver.getIconAndLabel();
             setLabel(iconAndLabel.label);
             setIcon(iconAndLabel.icon);
@@ -36,6 +37,7 @@ public class FileObserverNode extends DynamicTreeNode {
                 ((DefaultTreeModel) tree.getModel()).reload(this);
             });
         }
+        firstCheck = false;
     }
 
     void toggle() {

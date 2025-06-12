@@ -16,6 +16,7 @@ public class FileObserverToolbarButton extends AnAction {
     private final FileObserver fileObserver;
     private static final Logger LOGGER = Logger.getInstance(FileObserverToolbarButton.class);
     FileObserver.Status status;
+    private boolean firstCheck = true;
 
     public FileObserverToolbarButton(ObservedFile observedFile) {
         super(observedFile.getLabel(), observedFile.getLabel(), IconLoader.getIcon(observedFile.getIcon(), DxIcon.class));
@@ -32,12 +33,13 @@ public class FileObserverToolbarButton extends AnAction {
     public void check() {
         FileObserver.Status oldStatus = status;
         status = this.fileObserver.getStatus();
-        if (!status.equals(oldStatus)) {
+        if (firstCheck || !status.equals(oldStatus)) {
             FileObserver.IconAndLabel iconAndLabel = this.fileObserver.getIconAndLabel();
             Presentation presentation = getTemplatePresentation();
             presentation.setText(iconAndLabel.label);
             presentation.setIcon(iconAndLabel.icon);
             updatePresentation(this);
         }
+        firstCheck = false;
     }
 }
