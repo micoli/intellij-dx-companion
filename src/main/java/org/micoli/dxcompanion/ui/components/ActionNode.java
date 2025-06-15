@@ -11,7 +11,7 @@ public class ActionNode extends DynamicTreeNode {
 
     public ActionNode(Tree tree, Action action) {
         super(tree, action, IconLoader.getIcon(action.icon, DxIcon.class));
-        this.setAction(new RunnableAction(tree, action));
-        registerShortcut(action.label, action.shortcut, this.getAction());
+        setAction(new RunnableAction(action));
+        registerShortcut(action.label, action.shortcut, getAction());
     }
 }

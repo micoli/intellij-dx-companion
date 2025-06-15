@@ -8,14 +8,12 @@ import org.micoli.dxcompanion.configuration.models.Script;
 import org.micoli.dxcompanion.ui.components.tree.DxIcon;
 import org.micoli.dxcompanion.ui.components.helpers.RunnableAction;
 
-import java.awt.*;
-
 public class ScriptToolbarButton extends AnAction {
     private final RunnableAction runnableAction;
 
-    public ScriptToolbarButton(Component component, Script script) {
+    public ScriptToolbarButton(Script script) {
         super(script.label, script.label, IconLoader.getIcon(script.icon, DxIcon.class));
-        this.runnableAction = new RunnableAction(component, script);
+        this.runnableAction = new RunnableAction(script);
     }
 
     @Override

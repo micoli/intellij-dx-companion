@@ -80,7 +80,7 @@ class ToolWindowContent {
                 this.loadActionTree(loadedConfiguration);
 
                 LOGGER.debug("MainPanel reloaded");
-                // Notification.message("DX Companion reloaded");
+                Notification.message("DX Companion reloaded");
             });
         } catch (ConfigurationException e) {
             if (!this.configurationTimestamp.equals(e.serial)) {
@@ -110,10 +110,10 @@ class ToolWindowContent {
         }
         for (RunnableNode button : loadedConfiguration.configuration.toolbarButtons.clone()) {
             if (button instanceof Action action) {
-                this.leftActionGroup.add(new ActionToolbarButton(this.mainPanel, action));
+                this.leftActionGroup.add(new ActionToolbarButton(action));
             }
             if (button instanceof Script script) {
-                this.leftActionGroup.add(new ScriptToolbarButton(this.mainPanel, script));
+                this.leftActionGroup.add(new ScriptToolbarButton(script));
             }
             if (button instanceof ObservedFile observedFile) {
                 this.leftActionGroup.add(new FileObserverToolbarButton(observedFile));

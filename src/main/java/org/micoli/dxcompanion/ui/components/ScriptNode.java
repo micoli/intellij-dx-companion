@@ -11,7 +11,7 @@ public class ScriptNode extends DynamicTreeNode {
 
     public ScriptNode(Tree tree, Script script) {
         super(tree, script, IconLoader.getIcon(script.icon, DxIcon.class));
-        this.setAction(new RunnableAction(tree, script));
+        this.setAction(new RunnableAction(script));
         registerShortcut(script.label, script.shortcut, this.getAction());
     }
 }

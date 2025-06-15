@@ -19,7 +19,12 @@ DX Companion is an IntelliJ IDEA plugin designed to enhance developer experience
        "type": "observedFile",
        "label": "Debug Mode",
        "filePath": ".env",
-       "variableName": "DEBUG_MODE"
+       "variableName": "DEBUG_MODE",
+       "postToggle": {
+          "type": "action",
+          "command": "make reload-debug-mode",
+          "cwd": "/home"
+       }
     },
     {
        "type": "action",
@@ -168,16 +173,17 @@ The plugin supports following main node types:
 
 ### ObservedFile Properties
 
-| Property | Type | Required | Default | Description |
-|----------|------|----------|---------|-------------|
-| `label` | String | Yes | - | The display name for the toggle button |
-| `filePath` | String | Yes | - | Path to the file, relative to project root |
-| `variableName` | String | Yes | - | Name of the variable to toggle |
-| `commentPrefix` | String | No | `#` | Character(s) used to comment out variables |
-| `shortcut` | String | No | - | Keyboard shortcut (currently not implemented) |
-| `activeIcon` | String | No | `actions/inlayRenameInComments.svg` | Icon path when variable is active |
-| `inactiveIcon` | String | No | `actions/inlayRenameInCommentsActive.svg` | Icon path when variable is commented out |
-| `unknownIcon` | String | No | `expui/fileTypes/unknown.svg` | Icon path when file is not found |
+| Property        | Type      | Required | Default                                   | Description                                                               |
+|-----------------|-----------|----------|-------------------------------------------|---------------------------------------------------------------------------|
+| `label`         | String    | Yes | -                                         | The display name for the toggle button                                    |
+| `filePath`      | String    | Yes | -                                         | Path to the file, relative to project root                                |
+| `variableName`  | String    | Yes | -                                         | Name of the variable to toggle                                            |
+| `commentPrefix` | String    | No | `#`                                       | Character(s) used to comment out variables                                |
+| `shortcut`      | String    | No | -                                         | Keyboard shortcut (currently not implemented)                             |
+| `activeIcon`    | String    | No | `actions/inlayRenameInComments.svg`       | Icon path when variable is active                                         |
+| `inactiveIcon`  | String    | No | `actions/inlayRenameInCommentsActive.svg` | Icon path when variable is commented out                                  |
+| `unknownIcon`   | String    | No | `expui/fileTypes/unknown.svg`             | Icon path when file is not found                                          |
+| `postToggle`    | Structure | No | -                                         | a post toggle command (action or script) executed once toggle is executed |
 
 ### Action Properties
 
@@ -225,7 +231,11 @@ DxCompanion uses IntelliJ's built-in icon system. You can specify icons from the
       "label": "Debug Mode",
       "filePath": ".env",
       "variableName": "DEBUG_MODE",
-      "commentPrefix": "#"
+      "commentPrefix": "#",
+      "postToggle": {
+          "type": "script",
+          "source": "import static com.intellij.openapi.ui.Messages.showInfoMessage\n\nshowInfoMessage(\"DEBUG MODE CHANGED\",\"test\")"
+      }
     },
     {
       "label": "Feature Flag",
@@ -233,7 +243,12 @@ DxCompanion uses IntelliJ's built-in icon system. You can specify icons from the
       "variableName": "FEATURE_ENABLED",
       "commentPrefix": "#",
       "activeIcon": "actions/execute.svg",
-      "inactiveIcon": "actions/suspend.svg"
+      "inactiveIcon": "actions/suspend.svg",
+      "postToggle": {
+          "type": "action",
+          "command": "make reload-reload",
+          "cwd": "/home"
+      }
     },
     {
       "type": "script",

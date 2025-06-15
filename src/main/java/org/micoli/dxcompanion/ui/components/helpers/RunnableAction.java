@@ -17,6 +17,8 @@ import org.jetbrains.plugins.terminal.TerminalToolWindowFactory;
 import org.jetbrains.plugins.terminal.TerminalToolWindowManager;
 import org.micoli.dxcompanion.configuration.models.Action;
 import org.micoli.dxcompanion.configuration.models.ObservedFile;
+import org.micoli.dxcompanion.configuration.models.PostToggle.PostToggleAction;
+import org.micoli.dxcompanion.configuration.models.PostToggle.PostToggleScript;
 import org.micoli.dxcompanion.configuration.models.RunnableNode;
 import org.micoli.dxcompanion.configuration.models.Script;
 import org.micoli.dxcompanion.ui.Notification;
@@ -28,11 +30,9 @@ public class RunnableAction implements Runnable {
 
     private static final Logger LOGGER = Logger.getInstance(ActionNode.class);
     public static final String ACTION_PREFIX = "action:";
-    private final Component component;
     private final RunnableNode runnableNode;
 
-    public RunnableAction(Component component, RunnableNode runnableNode) {
-        this.component = component;
+    public RunnableAction(RunnableNode runnableNode) {
         this.runnableNode = runnableNode;
     }
 
@@ -43,10 +43,20 @@ public class RunnableAction implements Runnable {
                 runBuiltinAction(action.command.replaceFirst(ACTION_PREFIX, ""));
                 return;
             }
-            runShellAction(action);
+            runShellAction(action.label, action.command, action.cwd);
+        }
+        if (runnableNode instanceof PostToggleAction action){
+            if (action.command.startsWith(ACTION_PREFIX)) {
+                runBuiltinAction(action.command.replaceFirst(ACTION_PREFIX, ""));
+                return;
+            }
+            runShellAction(action.getLabel(), action.command, action.cwd);
         }
         if (runnableNode instanceof Script script){
-            runScript(script);
+            runScript(script.extension, script.source);
+        }
+        if (runnableNode instanceof PostToggleScript script){
+            runScript(script.extension, script.source);
         }
         if (runnableNode instanceof ObservedFile observedFile){
             toggleObservedFile(observedFile);
@@ -57,25 +67,25 @@ public class RunnableAction implements Runnable {
         new FileObserver(observedFile).toggle();
     }
 
-    private void runScript(Script script) {
-        IdeScriptEngine engine = IdeScriptEngineManager.getInstance().getEngineByFileExtension(script.extension, null);
+    private void runScript(String extension, String source) {
+        IdeScriptEngine engine = IdeScriptEngineManager.getInstance().getEngineByFileExtension(extension, null);
         if (engine == null) {
-            Notification.error(String.format("Script engine with extension '%s' is not found", script.extension));
+            Notification.error(String.format("Script engine with extension '%s' is not found", extension));
             return;
         }
         try {
-            engine.eval(script.source);
+            engine.eval(source);
         } catch (IdeScriptException e) {
             Notification.error(String.format(e.getMessage()));
         }
     }
 
-    private static void runShellAction(Action action) {
+    private static void runShellAction(String label, String command, String cwd) {
         Project project = ProjectManager.getInstance().getOpenProjects()[0];
 
         TerminalWidget terminalWidget = TerminalToolWindowManager
             .getInstance(project)
-            .createShellWidget(action.cwd != null ? action.cwd : project.getBasePath(), action.label, true, true);
+            .createShellWidget(cwd != null ? cwd : project.getBasePath(), label, true, true);
 
         ToolWindow window = ToolWindowManager.getInstance(project).getToolWindow(TerminalToolWindowFactory.TOOL_WINDOW_ID);
         if (window == null) {
@@ -87,7 +97,7 @@ public class RunnableAction implements Runnable {
 
         ApplicationManager.getApplication().invokeLater(() -> {
             terminalWidget
-                .sendCommandToExecute(action.command);
+                .sendCommandToExecute(command);
         });
     }
 

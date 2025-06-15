@@ -25,16 +25,13 @@ public class ActionTreeNodeConfigurator {
         this.tree = tree;
         this.treeModel = (DefaultTreeModel) tree.getModel();
         this.root = (DefaultMutableTreeNode) treeModel.getRoot();
+        this.registerDoubleClickAction(tree);
+        this.registerEnterKeyAction(tree);
     }
 
     public void configureTree(AbstractNode[] nodes) {
-
         root.removeAllChildren();
-
         addSubNodes(tree, root, nodes);
-
-        registerDoubleClickAction(tree);
-        registerEnterKeyAction(tree);
 
         TreeUtils.forEachLeaf(tree, (node, path) -> {
             treeModel.nodeChanged(node);

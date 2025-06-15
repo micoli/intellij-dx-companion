@@ -4,4 +4,5 @@
 
 ## [Unreleased]
 
-## [0.1.0] - 2025-03-28
+## [0.3.1] - 2025-06-15
+ - Addition of postToggle commands once an observed file is toggled 
